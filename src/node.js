@@ -1,3 +1,5 @@
+'use strict';
+
 class Node {
   constructor(data, priority) {
     this.data = data;
@@ -27,7 +29,7 @@ class Node {
         break;
       case this.right:
         this.right.parent = null;
-        this.right = null
+        this.right = null;
         break;
       default:
         throw new Error();
@@ -41,39 +43,55 @@ class Node {
   }
 
   swapWithParent() {
-    const boofer = {
-      data: this.parent.data,
-      priority: this.parent.priority,
-      parent: this.parent.parent,
-      left: this.parent.left,
-      right: this.parent.right,
-      boofer: this.parent,
-    };
+    if (this.parent) {
+      const boofer = {
+        data: this.parent.data,
+        priority: this.parent.priority,
+        parent: this.parent.parent,
+        left: this.parent.left,
+        right: this.parent.right,
+        boofer: this.parent,
+      };
 
-    this.parent.parent = this;
-    this.parent.left = this.left;
-    this.parent.right = this.right;
+      this.parent.parent = this;
+      this.parent.left = this.left;
+      this.parent.right = this.right;
+      if (this.left) {
+        this.left.parent = this.parent;
+      }
+      if (this.right) {
+        this.right.parent = this.parent;
+      }
 
-    switch (this) {
-      case boofer.left:
-        this.left = this.parent;
-        this.right = boofer.right;
-        break;
-      case boofer.right:
-        this.left = boofer.left;
-        this.right = this.right;
-        break;
+      switch (this) {
+        case boofer.left:
+          this.left = this.parent;
+          this.right = boofer.right;
+          if (this.right) {
+            this.right.parent = this;
+          }
+          break;
+        case boofer.right:
+          this.left = boofer.left;
+          this.right = this.parent;
+          if (this.left) {
+            this.left.parent = this;
+          }
+          break;
+      }
+      this.parent = boofer.parent;
+
+      if (boofer.parent) {
+        switch (boofer.boofer) {
+          case boofer.parent.left:
+            this.parent.left = this;
+            break;
+          case boofer.parent.right:
+            this.parent.right = this;
+            break;
+        }
+      }
     }
-    this.parent = boofer.parent;
-    
-//    switch (boofer.boofer) {
-//      case boofer.parent.left:
-//        this.parent.left = this;
-//        break;
-//      case boofer.parent.right:
-//        this.parent.right = this;
-//        break;
-//    }
   }
 }
 
